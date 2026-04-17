@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - TVRS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join the Traffic Violation Reporting System</p>
+            </div>
+            <form action="/register" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="name">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-control" required placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" required placeholder="john@example.com">
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label class="form-label">Account Type</label>
+                    <select name="role" class="form-control" required>
+                        <option value="citizen">Citizen</option>
+                        <option value="officer">Police Officer</option>
+                    </select>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <label class="form-label" for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required placeholder="Create a strong password">
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Sign Up</button>
+            </form>
+            
+            <div class="text-center mt-3" style="font-size: 0.875rem; color: var(--text-secondary);">
+                Already have an account? <a href="login.html" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

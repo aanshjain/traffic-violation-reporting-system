@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Reports - TVRS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .action-btns { display: flex; gap: 0.5rem; }
+        .evidence-thumb-img { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); cursor: pointer; transition: transform 0.2s; }
+        .evidence-thumb-img:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Police Dept</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="officer_dashboard.html" class="nav-link">Officer Dashboard</a>
+                <a href="officer_pending.html" class="nav-link active">View Pending Reports <span id="pending-badge" class="badge badge-pending" style="float: right;">0</span></a>
+                <a href="officer_approved.html" class="nav-link">View Approved Reports</a>
+                <a href="officer_rejected.html" class="nav-link">View Rejected Reports</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Review Pending Violations</div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">My Assigned Pending Reports</h2>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Report ID</th>
+                                <th>Citizen Name</th>
+                                <th>Vehicle Number</th>
+                                <th>Description</th>
+                                <th>Evidence Image</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamic-table-body">
+                            <tr><td colspan="6" class="text-center text-secondary">Loading reports...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fetch stats to update badge
+            fetch('/api/stats').then(r => r.json()).then(stats => {
+                document.getElementById('pending-badge').textContent = stats.pending;
+            });
+            
+            // Loop array injecting live mapped backend rows directly bypassing react DOM trees effortlessly
+            fetch('/api/reports/pending')
+                .then(r => r.json())
+                .then(data => {
+                    const tbody = document.getElementById('dynamic-table-body');
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary">No pending reports assigned to you.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = data.map(r => `
+                        <tr>
+                            <td>#RPT-${r.id}</td>
+                            <td>${r.citizen_name}</td>
+                            <td><strong>${r.vehicle_number}</strong></td>
+                            <td>${r.description}</td>
+                            <td>
+                                ${r.evidence_image ? `<a href="${r.evidence_image}" target="_blank"><img src="${r.evidence_image}" class="evidence-thumb-img" alt="Evidence" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" /> <div class="evidence-thumb flex align-center" style="display:none; background-color:#cbd5e1; justify-content:center; font-size:10px;">ERR</div></a>` : `<div class="evidence-thumb flex align-center" style="background-color:#cbd5e1; justify-content:center; font-size:10px;">N/A</div>`}
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="/approve/${r.id}" class="btn btn-success" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; text-decoration: none;">Approve</a>
+                                    <a href="/reject/${r.id}" class="btn btn-danger" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; text-decoration: none;">Reject</a>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('dynamic-table-body').innerHTML =
+                        '<tr><td colspan="6" class="text-center text-danger">Unable to load pending reports right now.</td></tr>';
+                });
+        });
+    </script>
+</body>
+</html>

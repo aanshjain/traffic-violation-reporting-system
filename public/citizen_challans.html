@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Challans - TVRS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .pay-note {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.35rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Citizen</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="citizen_dashboard.html" class="nav-link">Dashboard Overview</a>
+                <a href="citizen_submit.html" class="nav-link">Submit Violation</a>
+                <a href="citizen_reports.html" class="nav-link">View My Reports</a>
+                <a href="citizen_challans.html" class="nav-link active">View My Challans</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">My Issued Challans</div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">Challan History</h2>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Challan ID</th>
+                                <th>Report Ref</th>
+                                <th>Amount</th>
+                                <th>Issue Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamic-table-body">
+                            <tr><td colspan="6" class="text-center text-secondary">Loading challans...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const upcomingPaymentMessage = () => {
+                alert('Online challan payment is a future update. Coming soon.');
+            };
+
+            fetch('/api/challans/citizen')
+                .then(r => r.json())
+                .then(data => {
+                    const tbody = document.getElementById('dynamic-table-body');
+                    if (data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary">No challans issued for your reports.</td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = data.map(c => `
+                        <tr>
+                            <td>#CH-${c.id}</td>
+                            <td><a href="citizen_reports.html" style="color: var(--primary-color);">#RPT-${c.report_id}</a></td>
+                            <td><strong>₹${c.amount}</strong></td>
+                            <td>${new Date(c.issue_date).toLocaleDateString()}</td>
+                            <td><span class="badge ${c.status === 'unpaid' ? 'badge-pending' : 'badge-approved'}" style="text-transform: capitalize;">${c.status}</span></td>
+                            <td>
+                                <button class="btn btn-primary" style="padding: 0.35rem 0.75rem;" onclick="upcomingPaymentMessage()">Pay Now</button>
+                                <div class="pay-note">Future update</div>
+                            </td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('dynamic-table-body').innerHTML =
+                        '<tr><td colspan="6" class="text-center text-danger">Unable to load challans right now.</td></tr>';
+                });
+
+            window.upcomingPaymentMessage = upcomingPaymentMessage;
+        });
+    </script>
+</body>
+</html>

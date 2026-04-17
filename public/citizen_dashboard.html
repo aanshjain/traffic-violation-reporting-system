@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Dashboard - TVRS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #fff7cf 0%, #ffe082 100%);
+            border: 1px solid rgba(154, 101, 0, 0.18);
+            box-shadow: 0 10px 24px rgba(154, 101, 0, 0.12);
+        }
+
+        .reward-copy h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .reward-copy p {
+            margin: 0;
+            color: #6b4b00;
+        }
+
+        .reward-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .reward-pill {
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.72);
+            color: #6b4b00;
+            font-weight: 700;
+        }
+
+        .coin-art {
+            width: 88px;
+            height: 88px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 640px) {
+            .reward-card {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Citizen</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="citizen_dashboard.html" class="nav-link active">Dashboard Overview</a>
+                <a href="citizen_submit.html" class="nav-link">Submit Violation</a>
+                <a href="citizen_reports.html" class="nav-link">View My Reports</a>
+                <a href="citizen_challans.html" class="nav-link">View My Challans</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Citizen Dashboard</div>
+                <div class="user-profile">
+                    <span class="badge badge-active" id="citizen-name">Citizen User</span>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">Welcome to your Portal</h2>
+                <p class="mb-4 text-secondary">Manage your traffic violation reports and view issued challans from here.</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Reports Submitted</div>
+                        <div class="stat-value" id="stat-submitted">0</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-title">Reports Approved</div>
+                        <div class="stat-value" id="stat-approved">0</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-title">Challans Pending</div>
+                        <div class="stat-value" id="stat-challans">0</div>
+                    </div>
+                </div>
+
+                <div class="reward-card mt-4">
+                    <div class="reward-copy">
+                        <h3>Citizen Reward Wallet</h3>
+                        <p>Every report approved by police gives you 100 reward points, equal to Rs. 100.</p>
+                        <div class="reward-meta">
+                            <div class="reward-pill">Coins: <span id="reward-points">0</span> pts</div>
+                            <div class="reward-pill">Value: Rs. <span id="reward-value">0</span></div>
+                        </div>
+                    </div>
+                    <img src="coin.svg" alt="Reward coin" class="coin-art">
+                </div>
+                
+                <div class="card mt-4">
+                    <h3>Quick Actions</h3>
+                    <div class="flex gap-2 mt-3">
+                        <a href="citizen_submit.html" class="btn btn-primary">File a New Report</a>
+                        <a href="citizen_reports.html" class="btn btn-outline">Check Report Status</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const submittedEl = document.getElementById('stat-submitted');
+            const approvedEl = document.getElementById('stat-approved');
+            const challansEl = document.getElementById('stat-challans');
+            const pointsEl = document.getElementById('reward-points');
+            const valueEl = document.getElementById('reward-value');
+            const nameEl = document.getElementById('citizen-name');
+
+            try {
+                const [sessionRes, statsRes] = await Promise.all([
+                    fetch('/api/session'),
+                    fetch('/api/stats/citizen')
+                ]);
+
+                const session = await sessionRes.json();
+                const stats = await statsRes.json();
+
+                if (session?.user?.name) {
+                    nameEl.textContent = session.user.name;
+                }
+
+                submittedEl.textContent = stats.submitted ?? 0;
+                approvedEl.textContent = stats.approved ?? 0;
+                challansEl.textContent = stats.pendingChallans ?? 0;
+                pointsEl.textContent = stats.rewardPoints ?? 0;
+                valueEl.textContent = stats.rewardValue ?? 0;
+            } catch (err) {
+                submittedEl.textContent = '0';
+                approvedEl.textContent = '0';
+                challansEl.textContent = '0';
+                pointsEl.textContent = '0';
+                valueEl.textContent = '0';
+            }
+        });
+    </script>
+</body>
+</html>

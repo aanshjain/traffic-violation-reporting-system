@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officers List - TVRS Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin_dashboard.html" class="nav-link">Admin Dashboard</a>
+                <a href="admin_officers.html" class="nav-link active">View Officers</a>
+                <a href="admin_reports.html" class="nav-link">View All Reports</a>
+                <a href="admin_stats.html" class="nav-link">System Statistics</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Officer Directory</div>
+            </header>
+            
+            <div class="content-area">
+                <div class="flex justify-between align-center mb-4 text-primary">
+                    <h2 class="page-title" style="margin-bottom:0; border:none;">Enforcement Personnel</h2>
+                    <span class="badge badge-approved" id="officer-count">Loading...</span>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Officer Name</th>
+                                <th>Tag ID</th>
+                                <th>Challans Issued</th>
+                                <th>Reward Coins</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamic-table-body">
+                            <tr><td colspan="6" class="text-center text-secondary">Loading officers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/officers')
+                .then((res) => res.json())
+                .then((officers) => {
+                    const tbody = document.getElementById('dynamic-table-body');
+                    const count = document.getElementById('officer-count');
+
+                    if (!Array.isArray(officers) || officers.length === 0) {
+                        count.textContent = '0 Officers';
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-secondary">No officers found.</td></tr>';
+                        return;
+                    }
+
+                    count.textContent = `${officers.length} Officers`;
+                    tbody.innerHTML = officers.map((officer) => {
+                        const statusClass = officer.active_status === 'Active'
+                            ? 'badge-approved'
+                            : officer.active_status === 'Suspended'
+                                ? 'badge-rejected'
+                                : 'badge-pending';
+
+                        return `
+                            <tr>
+                                <td>${officer.name}</td>
+                                <td><strong>${officer.tag_id}</strong></td>
+                                <td>${officer.challans_issued}</td>
+                                <td>${officer.reward_points || 0}</td>
+                                <td><span class="badge ${statusClass}">${officer.active_status}</span></td>
+                                <td><span class="text-secondary">View only</span></td>
+                            </tr>
+                        `;
+                    }).join('');
+                })
+                .catch(() => {
+                    document.getElementById('officer-count').textContent = 'Unavailable';
+                    document.getElementById('dynamic-table-body').innerHTML =
+                        '<tr><td colspan="6" class="text-center text-danger">Unable to load officers right now.</td></tr>';
+                });
+        });
+    </script>
+</body>
+</html>

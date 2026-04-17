@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - TVRS Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .stat-huge {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin_dashboard.html" class="nav-link">Admin Dashboard</a>
+                <a href="admin_officers.html" class="nav-link">View Officers</a>
+                <a href="admin_reports.html" class="nav-link">View All Reports</a>
+                <a href="admin_stats.html" class="nav-link active">System Statistics</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Global System Metrics</div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">Comprehensive Statistics</h2>
+                
+                <div class="grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                    
+                    <div class="card text-center" style="border-top: 4px solid var(--warning-color);">
+                        <div class="stat-huge" id="stat-pending" style="color: var(--warning-color);">...</div>
+                        <div class="stat-title text-secondary">Total Reports Pending</div>
+                    </div>
+                    
+                    <div class="card text-center" style="border-top: 4px solid var(--secondary-color);">
+                        <div class="stat-huge" id="stat-officers">...</div>
+                        <div class="stat-title text-secondary">Total Registered Officers</div>
+                    </div>
+                    
+                    <div class="card text-center" style="border-top: 4px solid var(--success-color);">
+                        <div class="stat-huge text-success" id="stat-approved" style="color: var(--success-color);">...</div>
+                        <div class="stat-title text-secondary">Total Reports Approved</div>
+                    </div>
+                    
+                    <div class="card text-center" style="border-top: 4px solid var(--danger-color);">
+                        <div class="stat-huge text-danger" id="stat-rejected" style="color: var(--danger-color);">...</div>
+                        <div class="stat-title text-secondary">Total Reports Rejected</div>
+                    </div>
+
+                </div>
+                
+                <div class="card">
+                    <h3>Report Resolution Context</h3>
+                    <p class="text-secondary mt-2">Metrics derived dynamically directly from verified operational SQL parameters strictly matching requirement automation logic mappings.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Automation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('stat-pending').textContent = data.pending;
+                    document.getElementById('stat-officers').textContent = data.officers;
+                    document.getElementById('stat-approved').textContent = data.approved;
+                    document.getElementById('stat-rejected').textContent = data.rejected;
+                })
+                .catch(err => console.error(err));
+        });
+    </script>
+</body>
+</html>

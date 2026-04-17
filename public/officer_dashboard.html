@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Dashboard - TVRS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reward-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #eef7ff 0%, #cfe6ff 100%);
+            border: 1px solid rgba(37, 99, 235, 0.16);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+        }
+
+        .reward-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .reward-pill {
+            padding: 0.65rem 1rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.85);
+            font-weight: 700;
+            color: #17427a;
+        }
+
+        .coin-art {
+            width: 84px;
+            height: 84px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 640px) {
+            .reward-card {
+                flex-direction: column-reverse;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Police Dept</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="officer_dashboard.html" class="nav-link active">Officer Dashboard</a>
+                <a href="officer_pending.html" class="nav-link">View Pending Reports <span id="pending-badge" class="badge badge-pending" style="float: right;">...</span></a>
+                <a href="officer_approved.html" class="nav-link">View Approved Reports</a>
+                <a href="officer_rejected.html" class="nav-link">View Rejected Reports</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Traffic Division Command Center</div>
+                <div class="user-profile">
+                    <span class="badge" id="officer-tag" style="background-color: var(--primary-color); color: white;">Officer ID: ...</span>
+                </div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">Welcome, Officer</h2>
+                <p class="mb-4 text-secondary">Review pending violation reports submitted by citizens and take necessary enforcement action.</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card warning">
+                        <div class="stat-title">Pending Review</div>
+                        <div class="stat-value" id="stat-pending">...</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-title">Approved Reports</div>
+                        <div class="stat-value" id="stat-approved">...</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-title">Rejected Reports</div>
+                        <div class="stat-value" id="stat-rejected">...</div>
+                    </div>
+                </div>
+
+                <div class="reward-card mt-4">
+                    <div>
+                        <h3>Officer Reward Wallet</h3>
+                        <p class="text-secondary" style="margin: 0;">Every approved report adds 100 coins to your account.</p>
+                        <div class="reward-meta">
+                            <div class="reward-pill">Coins: <span id="reward-points">0</span></div>
+                            <div class="reward-pill">Value: Rs. <span id="reward-value">0</span></div>
+                        </div>
+                    </div>
+                    <img src="coin.svg" alt="Officer reward coin" class="coin-art">
+                </div>
+                
+                <div class="card mt-4">
+                    <h3>Action Required</h3>
+                    <p class="mb-3">Only the reports assigned to your account appear in your queue, so work is distributed across all officers.</p>
+                    <a href="officer_pending.html" class="btn btn-primary">Review Pending Reports</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Automation -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('stat-pending').textContent = data.pending;
+                    document.getElementById('stat-approved').textContent = data.approved;
+                    document.getElementById('stat-rejected').textContent = data.rejected;
+                    document.getElementById('pending-badge').textContent = data.pending;
+                    document.getElementById('reward-points').textContent = data.rewardPoints ?? 0;
+                    document.getElementById('reward-value').textContent = data.rewardValue ?? 0;
+                    document.getElementById('officer-tag').textContent = `Officer ID: ${data.officerTag || '...'}`;
+                })
+                .catch(err => console.error(err));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Violation - TVRS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Citizen</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="citizen_dashboard.html" class="nav-link">Dashboard Overview</a>
+                <a href="citizen_submit.html" class="nav-link active">Submit Violation</a>
+                <a href="citizen_reports.html" class="nav-link">View My Reports</a>
+                <a href="citizen_challans.html" class="nav-link">View My Challans</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Submit a New Violation</div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">Report Traffic Violation</h2>
+                <div class="card" style="max-width: 600px;">
+                    <form action="/submit_report" method="POST" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="form-label" for="vehicle_number">Vehicle Number</label>
+                            <input type="text" id="vehicle_number" name="vehicle_number" class="form-control" placeholder="e.g. MH-12-AB-1234" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="description">Violation Description</label>
+                            <textarea id="description" name="description" class="form-control" placeholder="Describe the violation in detail (e.g., Signal jump, wrong side driving)" required></textarea>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label class="form-label" for="evidence">Upload Evidence Image</label>
+                            <input type="file" id="evidence" name="evidence" class="form-control" accept="image/*" required>
+                            <small class="text-light mt-1" style="display:block;">Supported formats: JPG, PNG, GIF</small>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <button type="submit" class="btn btn-primary">Submit Report</button>
+                            <a href="citizen_dashboard.html" class="btn btn-outline">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

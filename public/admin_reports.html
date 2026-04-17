@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Reports - TVRS Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>TVRS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin_dashboard.html" class="nav-link">Admin Dashboard</a>
+                <a href="admin_officers.html" class="nav-link">View Officers</a>
+                <a href="admin_reports.html" class="nav-link active">View All Reports</a>
+                <a href="admin_stats.html" class="nav-link">System Statistics</a>
+                <div style="margin-top: 2rem;">
+                    <a href="/logout" class="nav-link text-danger" style="border-left: none;">Logout</a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="header">
+                <div class="header-title">Global Reports Ledger</div>
+            </header>
+            
+            <div class="content-area">
+                <h2 class="page-title">All Violation Reports</h2>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Report ID</th>
+                                <th>Citizen</th>
+                                <th>Vehicle No</th>
+                                <th>Description</th>
+                                <th>Assigned Officer</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Evidence</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dynamic-table-body">
+                            <tr><td colspan="8" class="text-center text-secondary">Loading reports...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/api/reports')
+                .then((res) => res.json())
+                .then((data) => {
+                    const tbody = document.getElementById('dynamic-table-body');
+
+                    if (!Array.isArray(data) || data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-secondary">No reports found.</td></tr>';
+                        return;
+                    }
+
+                    const badgeClass = (status) => {
+                        if (status === 'approved') return 'badge-approved';
+                        if (status === 'rejected') return 'badge-rejected';
+                        return 'badge-pending';
+                    };
+
+                    tbody.innerHTML = data.map((report) => `
+                        <tr>
+                            <td>#RPT-${report.id}</td>
+                            <td>${report.citizen_name}</td>
+                            <td><strong>${report.vehicle_number}</strong></td>
+                            <td>${report.description}</td>
+                            <td>${report.assigned_officer_name || 'Unassigned'}</td>
+                            <td>${new Date(report.created_at).toLocaleDateString()}</td>
+                            <td><span class="badge ${badgeClass(report.status)}" style="text-transform: capitalize;">${report.status}</span></td>
+                            <td>${report.evidence_image ? `<a href="${report.evidence_image}" target="_blank" style="color: var(--primary-color);">View</a>` : 'N/A'}</td>
+                        </tr>
+                    `).join('');
+                })
+                .catch(() => {
+                    document.getElementById('dynamic-table-body').innerHTML =
+                        '<tr><td colspan="8" class="text-center text-danger">Unable to load reports right now.</td></tr>';
+                });
+        });
+    </script>
+</body>
+</html>
